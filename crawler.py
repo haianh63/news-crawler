@@ -5,13 +5,20 @@ import google.generativeai as genai
 from datetime import datetime
 from urllib.parse import urlparse
 from cleaner import Cleaner
+from dotenv import load_dotenv
+import os
+from openai import OpenAI
+import json
+load_dotenv()
 
 class NewsCrawler:
     def __init__(self):
-        GEMINI_API_KEY = "AIzaSyA0ugl8fky3FvhUsKtFRflGtEDV2nKUTIw"
+        # GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
         MONGO_URI = "mongodb://localhost:27017/"
-        genai.configure(api_key=GEMINI_API_KEY)
-        self.model = genai.GenerativeModel('gemini-1.5-flash') 
+        # genai.configure(api_key=GEMINI_API_KEY)
+        # self.model = genai.GenerativeModel('gemini-2.0-flash') 
+        OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(api_key=OPENAI_API_KEY)
         client = MongoClient(MONGO_URI)
         db = client["crawler_db"]
         self.rules_collection = db["domain_rules"]
@@ -24,14 +31,17 @@ class NewsCrawler:
         return cleaned
 
     def get_html(self, url):
-        """Tải HTML từ URL và làm sạch nó."""
+        """Tải HTML từ URL và làm sạch"""
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
         response = requests.get(url, headers=headers, timeout=10)
+        with open("input.html", "w", encoding="utf-8") as f:
+            f.write(response.text)
         if response.status_code == 200:
             return self.cleaner.clean_html(response.text)
         else:
+            print(f"Failed to fetch {url}: {response.status_code}")
             raise Exception(f"Failed to fetch {url}: {response.status_code}")
     
     def get_domain(self, url):
@@ -67,11 +77,27 @@ class NewsCrawler:
         """
         
         try:
-            response = self.model.generate_content(prompt)
-            cleaned_response = self.clean_response(response.text)
-            print(cleaned_response)
-            import json
-            rules = json.loads(cleaned_response)
+            # response = self.model.generate_content(prompt)
+            # cleaned_response = self.clean_response(response.text)
+            # print(cleaned_response)
+            
+            # rules = json.loads(cleaned_response)
+            # return rules
+
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0
+            )
+
+            # cleaned = self.clean_response(response.choices[0].message['content'])
+            # print(cleaned)
+            # return json.loads(cleaned)
+            raw = response.choices[0].message.content
+
+            cleaned = self.clean_response(raw)
+
+            rules = json.loads(cleaned)
             return rules
         except Exception as e:
             raise Exception(f"Failed to parse Gemini response: {e}")
@@ -97,8 +123,6 @@ class NewsCrawler:
     def crawl_article(self, url):
         try:
             html = self.get_html(url)
-            with open("output.html", "w", encoding="utf-8") as f:
-                f.write(html)
             domain = self.get_domain(url)
             rules = self.get_rules_from_db(domain)
             
@@ -121,4 +145,5 @@ class NewsCrawler:
             
                 
         except Exception as e:
+            print(str(e))
             return {"error": str(e)}

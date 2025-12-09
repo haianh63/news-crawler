@@ -29,7 +29,7 @@ TOPICS = [
 ]
 
 CHECKERS = {
-    topic: TitleDuplicateChecker(similarity_threshold=0.85)
+    topic: TitleDuplicateChecker(similarity_threshold=0.70)
     for topic in TOPICS
 }
 RSS_FEEDS = [
@@ -38,15 +38,15 @@ RSS_FEEDS = [
         # ('Xã hội', "https://vnexpress.net/rss/thoi-su.rss", "VnExpress"),
         # ('Kinh tế', "https://vnexpress.net/rss/kinh-doanh.rss", "VnExpress"),
         # ('Kinh tế', "https://vnexpress.net/rss/startup.rss", "VnExpress"),
-        ('Giải trí', "https://vnexpress.net/rss/giai-tri.rss", "VnExpress"),
+        # ('Giải trí', "https://vnexpress.net/rss/giai-tri.rss", "VnExpress"),
         # ('Thể thao', "https://vnexpress.net/rss/the-thao.rss", "VnExpress"),
         # ('Pháp luật', "https://vnexpress.net/rss/phap-luat.rss", "VnExpress"),
         # ('Giáo dục', "https://vnexpress.net/rss/giao-duc.rss", "VnExpress"),
         # ('Sức khoẻ', "https://vnexpress.net/rss/suc-khoe.rss", "VnExpress"),
         # ('Đời sống', "https://vnexpress.net/rss/gia-dinh.rss", "VnExpress"),
-        # ('Du lịch', "https://vnexpress.net/rss/du-lich.rss", "VnExpress"),
-        # ('Khoa học - Công nghệ', "https://vnexpress.net/rss/khoa-hoc-cong-nghe.rss", "VnExpress"),
-        # ('Xe', "https://vnexpress.net/rss/oto-xe-may.rss", "VnExpress"),
+        ('Du lịch', "https://vnexpress.net/rss/du-lich.rss", "VnExpress"),
+        ('Khoa học - Công nghệ', "https://vnexpress.net/rss/khoa-hoc-cong-nghe.rss", "VnExpress"),
+        ('Xe', "https://vnexpress.net/rss/oto-xe-may.rss", "VnExpress"),
     ],
     [
         # ('Xã hội', 'https://thanhnien.vn/rss/thoi-su.rss', "Thanh niên"),
@@ -54,9 +54,9 @@ RSS_FEEDS = [
         # ('Thế giới', 'https://thanhnien.vn/rss/the-gioi.rss', "Thanh niên"),
         # ('Kinh tế', 'https://thanhnien.vn/rss/kinh-te.rss', "Thanh niên"),
         # ('Đời sống', 'https://thanhnien.vn/rss/doi-song.rss', "Thanh niên"),
-        ('Sức khoẻ', 'https://thanhnien.vn/rss/suc-khoe.rss', "Thanh niên"),
+        # ('Sức khoẻ', 'https://thanhnien.vn/rss/suc-khoe.rss', "Thanh niên"),
         # ('Giáo dục', 'https://thanhnien.vn/rss/giao-duc.rss', "Thanh niên"),
-        ('Du lịch', 'https://thanhnien.vn/rss/du-lich.rss', "Thanh niên"),
+        # ('Du lịch', 'https://thanhnien.vn/rss/du-lich.rss', "Thanh niên"),
         # ('Giải trí', 'https://thanhnien.vn/rss/van-hoa.rss', "Thanh niên"),
         # ('Giải trí', 'https://thanhnien.vn/rss/giai-tri.rss', "Thanh niên"),
         # ('Thể thao', 'https://thanhnien.vn/rss/the-thao.rss', "Thanh niên"),
@@ -181,26 +181,27 @@ def fetch_full_content(url):
 
 def crawl():
     logger.info("Start crawling")
-    data = parseRss(RSS_FEEDS[1])
+    data = parseRss(RSS_FEEDS[0])
     parseData(data)
     logger.info("Crawling completed")
 
 if __name__ == "__main__":
-    # urls = [
-    #     'https://vnexpress.net/kho-bac-da-giai-ngan-hon-10-400-ty-dong-chi-phi-tang-qua-2-9-4934005.html',
-    #     'https://vtcnews.vn/3-chinh-sach-giao-duc-quan-trong-co-hieu-luc-tu-thang-9-2025-ar963105.html',
-    #     'https://dantri.com.vn/xa-hoi/viet-nam-trao-tang-nhan-dan-cuba-385-ty-dong-20250901135605157.htm',
-    #     'https://thanhnien.vn/viet-nam-nhan-chuyen-giao-cong-nghe-san-xuat-thuoc-dieu-tri-ung-thu-cua-cuba-18525090115084312.htm',
-    #     'https://vietnamnet.vn/chan-dung-13-bo-truong-gd-dt-trong-80-nam-qua-2436981.html',
-    #     'https://vietnamnet.vn/an-so-o-le-duyet-binh-co-luong-may-bay-lon-nhat-cua-40-nam-truoc-2437534.html',
-    #     'https://tienphong.vn/nhung-nguoi-thoi-hon-cho-cuoc-dieu-binh-lich-su-post1774647.tpo'
-    # ]
+    urls = [
+        # 'https://vnexpress.net/kho-bac-da-giai-ngan-hon-10-400-ty-dong-chi-phi-tang-qua-2-9-4934005.html',
+        # 'https://vtcnews.vn/3-chinh-sach-giao-duc-quan-trong-co-hieu-luc-tu-thang-9-2025-ar963105.html',
+        # 'https://dantri.com.vn/xa-hoi/viet-nam-trao-tang-nhan-dan-cuba-385-ty-dong-20250901135605157.htm',
+        # 'https://thanhnien.vn/viet-nam-nhan-chuyen-giao-cong-nghe-san-xuat-thuoc-dieu-tri-ung-thu-cua-cuba-18525090115084312.htm',
+        # 'https://vietnamnet.vn/chan-dung-13-bo-truong-gd-dt-trong-80-nam-qua-2436981.html',
+        # 'https://vietnamnet.vn/an-so-o-le-duyet-binh-co-luong-may-bay-lon-nhat-cua-40-nam-truoc-2437534.html',
+        # 'https://tienphong.vn/nhung-nguoi-thoi-hon-cho-cuoc-dieu-binh-lich-su-post1774647.tpo',
+        "https://tuoitre.vn/nguoi-ha-noi-da-ke-khai-thong-tin-3-3-trieu-xe-co-cong-an-gap-rut-lam-sach-du-lieu-20251209220716227.htm"
+    ]
 
-    # for url in urls:
-    #     response = crawler.crawl_article(url)
-    #     print(response)
+    for url in urls:
+        response = crawler.crawl_article(url)
+        print(response)
 
-    crawl()
+    # crawl()
     schedule.every(1).hours.do(crawl)
     while True:
         schedule.run_pending()

@@ -18,41 +18,33 @@ class Cleaner:
     def clean_html(self, html):
         soup = BeautifulSoup(html, 'html.parser')
 
-        # 1. Loại bỏ các thẻ không mong muốn
         for tag in soup(['script', 'style', 'header', 'footer', 'nav', 'aside', 'iframe', 'form']):
             tag.decompose()
 
-        # 2. Loại bỏ theo id/class/name
         for attr in ['id', 'class', 'name']:
             for tag in soup.find_all(attrs={attr: self.REMOVE_PATTERN}):
                 tag.decompose()
 
-        # 3. Loại bỏ quảng cáo theo class thường gặp
         for tag in soup.find_all(
             ['div', 'section'],
             class_=re.compile(r'(^|[-_\s])(ad|advert|banner|sponsor)([-_\s]|$)', re.I)
         ):
             tag.decompose()
 
-        # 4. Loại bỏ <em> không chứa ảnh
         for em in soup.find_all('em'):
             if not em.find('img'):
                 em.unwrap()
 
-        # 5. Loại bỏ drop-cap
         for span in soup.select('span.dropcap, span.drop_cap'):
             span.decompose()
 
-        # 6. Loại bỏ span trong <p>
         for span in soup.select('p span'):
             span.unwrap()
 
-        # 7. Xóa thẻ rỗng (trừ img, br)
         for tag in soup.find_all():
             if not tag.get_text(strip=True) and tag.name not in ['img', 'br']:
                 tag.decompose()
 
-        # 8. Xử lý body
         body = soup.find('body')
         if body:
             if 'class' in body.attrs:
